@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>狮王争霸test</title>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"></link>
+    <link href="/main.css" rel="stylesheet"></link>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/app.js"></script>
+</head>
+<body>
+<div>
+    <h1 id="status">离线</h1>
+    用户:<span th:inline="text" id="playerId">[[${#httpServletRequest.remoteUser}]]</span>
+    <br>
+    房间ID：<span id="roomId"> 未进入房间</span>
+    <br>
+    房间人员：<span id="roomPlayers"></span>
+    <br>
+    <div>
+        <button id="createRoom" style="display: none">创建房间并进入</button>
+        <button id="apply" style="display: none">邀请</button>
+    </div>
+    <div id="fighting" style="display: none">
+        <div id="msg" style="overflow: auto"></div>
+    </div>
+
+</div>
+</body>
+</html>
