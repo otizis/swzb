@@ -80,12 +80,7 @@ function applyBack(msg) {
         stompClient.send("/app/joinRoom/"+msg.roomId);
     }
 }
-function applyAnswer(msg) {
-    if(roomId != msg.roomId){
-        return ;
-    }
-    addTOMsg('<p>'+msg.playerId+':'+msg.answer+'</p>');
-}
+
 
 function stepBegin(step){
     var optionHtml = "";

@@ -20,7 +20,7 @@ public class Room
     RoomStatusEnum status;
     Long matchId;
     HashSet<Long> playerIds = new HashSet<>();
-    int maxPlayerNum = 1;
+    int maxPlayerNum = 2;
 
     public int getMaxPlayerNum()
     {
