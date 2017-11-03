@@ -27,6 +27,9 @@ function connect() {
                 case 'matchEnd':
                     matchEnd(resp.msg.matchResult);
                     break;
+                case 'info':
+                    alert(resp.msg.text);
+                    break;
                 default:
                     console.error("不能处理的消息~");
             }

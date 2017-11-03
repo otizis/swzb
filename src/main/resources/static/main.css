@@ -19,7 +19,8 @@ body {
     display: inline-block;
     width: 45%;
     vertical-align: top;
-    max-height: 700px;
+    max-height: 500px;
+    overflow: auto;
 }
 
 .apply-link {

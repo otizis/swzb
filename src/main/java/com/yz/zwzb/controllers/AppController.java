@@ -96,6 +96,8 @@ public class AppController
         if (room == null)
         {
             // 说明加入失败
+            template.convertAndSendToUser(principal.getName(), "/queue/reply",//
+                    new Resp("info").fill("text", "进入房间失败，可能已经满了。或者已经销毁的房间。"));
             return;
         }
         updateRoomPlayerList(room);
