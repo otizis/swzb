@@ -41,7 +41,9 @@ public class Result
     public Result(){
 
     }
-    public Result(int answer){
+
+    public Result(Integer answer)
+    {
         this.answer = answer;
     }
     public Date getAnswerTime()

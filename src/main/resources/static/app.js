@@ -1,5 +1,6 @@
 var stompClient = null;
 var roomId ,matchId;
+var countDownTimeOut, count;
 
 function connect() {
     var socket = new SockJS('/socket');
@@ -104,13 +105,22 @@ function stepBegin(step){
         optionHtml+= ('<input type="button" data-v="'+obj+'" value="'+a+'">')
     }
     addTOMsg('<p>'+step.question+'['+step.score+'分]<br>'+optionHtml+'</p>');
+    count = 15;
+    countDownTimeOut = setInterval(function () {
+        count--;
+        $("#countDown").text(count);
+        if (count <= 0) {
+            stompClient.send("/app/answer", {}, JSON.stringify({roomId: roomId, matchId: matchId}));
+            clearInterval(countDownTimeOut);
+        }
+    }, 1000)
 }
 function stepEnd(step,nextStep){
     var resultHtml = "";
     var playerAnswer = step.playerAnswer;
     for(var playerId in playerAnswer){
         var result = playerAnswer[playerId];
-        var answer = step.options[result.answer];
+        var answer = step.options[result.answer] || '跳过';
         resultHtml +=('<p>用户'+playerId+'的回答:'+answer+'['+(result.right?'对':'错')+']</p>');
     }
     addTOMsg(resultHtml+'<hr>');
@@ -153,6 +163,7 @@ $(function () {
     });
     $("#msg").on("click",'input',function () {
         var v = $(this).data('v');
+        clearInterval(countDownTimeOut);
         stompClient.send("/app/answer",{},JSON.stringify({roomId:roomId,matchId:matchId,answer:v}));
         $("#msg input").hide();
     })
