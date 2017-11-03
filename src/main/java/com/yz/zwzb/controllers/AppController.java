@@ -88,6 +88,14 @@ public class AppController
     }
 
     // 用户加入房间
+    @MessageMapping("/waiting")
+    public void waiting(Principal principal)
+    {
+        String playerAccount = principal.getName();
+        template.convertAndSend("/topic", new Resp("msg").fill("text", playerAccount + "在等待，快来邀请我~"));
+    }
+
+    // 用户加入房间
     @MessageMapping("/joinRoom/{roomId}")
     public void joinRoom(Principal principal, @DestinationVariable Long roomId)
     {

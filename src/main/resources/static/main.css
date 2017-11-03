@@ -11,18 +11,22 @@ input + input {
     margin-left: 10px;
 }
 
-body {
+html, body {
     font-size: 16px;
+    height: 100%;
 }
 
 .topic, .main {
     display: inline-block;
     width: 45%;
     vertical-align: top;
-    max-height: 500px;
+    height: 100%;
     overflow: auto;
 }
 
+.topic {
+    border-left: 1px solid grey;
+}
 .apply-link {
     cursor: pointer;
 }

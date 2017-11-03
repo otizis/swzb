@@ -72,6 +72,7 @@ function updateRoomBack(msg){
             $("#exitRoom").show();
         }
         $("#createRoom").hide();
+        $("#waiting").hide();
         if(room.status == 'fighting'){
             $("#fighting").show();
             $("#apply").hide();
@@ -82,6 +83,7 @@ function updateRoomBack(msg){
         roomId = null;
         matchId = null;
         $("#createRoom").show();
+        $("#waiting").show();
         $("#exitRoom").hide();
         $("#apply").hide();
         $("#msg").html("");
@@ -91,6 +93,7 @@ function updateRoomBack(msg){
 function setConnected(b){
     $("#status").text(b ? "在线" : "离线");
     $("#createRoom").show();
+    $("#waiting").show();
 }
 
 function applyBack(msg) {
@@ -161,6 +164,9 @@ $(function () {
     connect();
     $( "#createRoom" ).click(function() {
         stompClient.send("/app/createRoom",{});
+    });
+    $("#waiting").click(function () {
+        stompClient.send("/app/waiting", {});
     });
     $( "#exitRoom" ).click(function() {
         stompClient.send("/app/exitRoom/"+roomId,{});
