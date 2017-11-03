@@ -1,11 +1,16 @@
 /*nothing*/
-input {
-    min-height: 80px;
+input, button {
+    min-width: 80px;
     border-radius: 3px;
-    border: 1px solid lightgrey;
+    border: 1px solid #5f96fb;
     padding: 3px 0;
+    background: white;
 }
 
 input + input {
     margin-left: 10px;
+}
+
+body {
+    font-size: 16px;
 }

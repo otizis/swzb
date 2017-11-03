@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+>
 <head>
     <title>登录</title>
 </head>
 <body>
 <div th:if="${param.error}">
-    Invalid username and password.
+    帐号密码错误，或已经被他人登录。
 </div>
 <div th:if="${param.logout}">
     You have been logged out.
