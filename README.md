@@ -1,7 +1,7 @@
 # swzb
 使用spring boot 实现基于webscoket实时 进入房间 同时答题的demo
 
-默认预制5个帐号：1，2，3，4，5
+默认预制5个帐号：test1，test2，test3，test4，test5
 
 密码都是111111
 
