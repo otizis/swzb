@@ -15,8 +15,11 @@
 <div>
     <h1 id="status">离线</h1>
     <form th:action="@{/logout}" method="post">
-        <b>用户:</b><span th:inline="text" id="playerId">[[${#httpServletRequest.remoteUser}]]</span><input type="submit"
-                                                                                                          value="退出登录"/>
+        <b>用户:</b>
+        <span th:inline="text" id="playerId">
+            [[${#httpServletRequest.remoteUser}]]
+        </span>
+        <input type="submit" value="退出登录"/>
     </form>
     <br>
     <b>房间ID：</b><span id="roomId">未进入房间</span>

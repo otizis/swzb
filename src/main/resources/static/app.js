@@ -45,7 +45,7 @@ function connect() {
 
     },
         function (error) {
-            alert(error);
+            addTOMsg("<p>" + error + "</p>");
         });
 }
 

@@ -5,6 +5,8 @@ import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning
+        .InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -14,21 +16,16 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter
+{
 
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .antMatchers("/index").permitAll()
-                .anyRequest().authenticated()
-                .and()
+    protected void configure(HttpSecurity http) throws Exception
+    {
+        http.authorizeRequests().antMatchers("/index").permitAll().anyRequest().authenticated().and()
 
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
-                .and()
+                .formLogin().loginPage("/login").permitAll().and()
 
                 .logout().permitAll().and()
 
@@ -47,12 +44,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("test1").password("111111").roles("USER").and().withUser("test2")
-                .password("111111").roles("USER").and().withUser("test3").password("111111").roles("USER").and()
-                .withUser("test4").password("111111").roles("USER").and().withUser("test5").password("111111").roles
-                ("USER");
-
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
+    {
+        InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> authentication = auth
+                .inMemoryAuthentication();
+        for (int i = 0; i < 50; i++)
+        {
+            authentication.withUser("test" + i).password("111111").roles("USER");
+        }
 
     }
 
