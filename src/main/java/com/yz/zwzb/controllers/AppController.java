@@ -93,6 +93,11 @@ public class AppController
     {
         String playerAccount = principal.getName();
         Room room = RoomService.joinRoom(roomId, playerAccount);
+        if (room == null)
+        {
+            // 说明加入失败
+            return;
+        }
         updateRoomPlayerList(room);
         if (RoomStatusEnum.fighting.equals(room.getStatus()))
         {
