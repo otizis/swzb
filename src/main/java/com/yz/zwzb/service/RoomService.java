@@ -60,6 +60,10 @@ public class RoomService
         }
         HashSet<String> playerAccounts = room.getPlayerAccounts();
         playerAccounts.remove(playerAccount);
+        if (playerAccounts.isEmpty())
+        {
+            rooms.remove(roomId);
+        }
         return null;
     }
 

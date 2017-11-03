@@ -18,10 +18,12 @@ public class MatchService
 
     static HashMap<Long, Match> data = new HashMap<>();
 
+
     public static Match getMatch(Long matchId)
     {
         return data.get(matchId);
     }
+
 
     public static Match newMatch()
     {
@@ -39,6 +41,7 @@ public class MatchService
         data.put(l, match);
         return match;
     }
+
 
     public static Step newStep()
     {
