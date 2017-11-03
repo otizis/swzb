@@ -45,7 +45,7 @@ function connect() {
 
     },
         function (error) {
-            addTOMsg("<p>" + error + "</p>");
+            addTOMsg("<p> 连接服务器丢，请刷新页面" + error + "</p>");
         });
 }
 
@@ -68,8 +68,6 @@ function updateRoomBack(msg){
         if(room.status == 'fighting'){
             $("#fighting").show();
             $("#apply").hide();
-            $("#msg").html("");
-            $('<hr><p>人员齐备，比赛开始</p>').appendTo("#msg");
         }
     }else{
         $("#roomId").text("未进入房间");
@@ -151,6 +149,7 @@ $(function () {
     });
     $( "#apply" ).click(function() {
         stompClient.send("/app/apply",{},JSON.stringify({roomId:roomId}));
+        $("#msg").html("");
     });
     $("#msg").on("click",'input',function () {
         var v = $(this).data('v');

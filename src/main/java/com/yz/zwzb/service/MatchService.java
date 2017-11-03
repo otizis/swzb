@@ -4,21 +4,29 @@ import com.yz.zwzb.domain.Match;
 import com.yz.zwzb.domain.PlayerResultOneMatch;
 import com.yz.zwzb.domain.Result;
 import com.yz.zwzb.domain.Step;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.beans.BeanUtils;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MatchService
 {
 
-    private static SimpMessagingTemplate template;
-
-    static AtomicLong maxRoomId = new AtomicLong(1);
+    static AtomicLong maxRoomId = new AtomicLong(0);
 
     static HashMap<Long, Match> data = new HashMap<>();
 
+    static List<Step> stepLib = new ArrayList<Step>();
 
+    static
+    {
+        stepLib.add(newStep());
+        stepLib.add(newStep1());
+        stepLib.add(newStep2());
+        stepLib.add(newStep3());
+        stepLib.add(newStep4());
+    }
     public static Match getMatch(Long matchId)
     {
         return data.get(matchId);
@@ -32,12 +40,7 @@ public class MatchService
         match.setId(l);
         match.setStartTime(new Date());
         match.setCurrStep(0);
-        match.setSteps(new ArrayList<Step>());
-        match.getSteps().add(newStep());
-        match.getSteps().add(newStep1());
-        match.getSteps().add(newStep2());
-        match.getSteps().add(newStep3());
-        match.getSteps().add(newStep4());
+        match.setSteps(get5Step());
         data.put(l, match);
         return match;
     }
@@ -54,7 +57,6 @@ public class MatchService
         step.getOptions().add("花");
         step.getOptions().add("岂");
         step.getOptions().add("物");
-        step.setTime(new Date());
         return step;
     }
 
@@ -69,7 +71,6 @@ public class MatchService
         step.getOptions().add("岁");
         step.getOptions().add("哭");
         step.getOptions().add("荣");
-        step.setTime(new Date());
         return step;
     }
 
@@ -84,7 +85,6 @@ public class MatchService
         step.getOptions().add("做");
         step.getOptions().add("春");
         step.getOptions().add("泥");
-        step.setTime(new Date());
         return step;
     }
 
@@ -99,7 +99,6 @@ public class MatchService
         step.getOptions().add("荣");
         step.getOptions().add("日");
         step.getOptions().add("尽");
-        step.setTime(new Date());
         return step;
     }
 
@@ -112,7 +111,6 @@ public class MatchService
         step.setOptions(new ArrayList<String>());
         step.getOptions().add("对");
         step.getOptions().add("错");
-        step.setTime(new Date());
         return step;
     }
 
@@ -147,5 +145,41 @@ public class MatchService
         }
         win.setWin(true);
         match.setMatchResult(matchResult);
+    }
+
+    public static List<Step> get5Step()
+    {
+        ArrayList<Step> steps = new ArrayList<>();
+        int num = stepLib.size();
+        Date now = new Date();
+        for (int i = 0; i < 5; i++)
+        {
+            int randomInt = getRandomInt(1, num);
+            Step step = stepLib.get(randomInt - 1);
+            Step cloneStep = new Step();
+            BeanUtils.copyProperties(step, cloneStep);
+            cloneStep.setPlayerAnswer(new HashMap<String, Result>());
+            cloneStep.setTime(now);
+            steps.add(cloneStep);
+        }
+        return steps;
+    }
+
+    /**
+     * 获得一个[min, max]之间的随机整数
+     *
+     * @param min
+     * @param max
+     * @return
+     */
+    public static int getRandomInt(int min, int max)
+    {
+        return getRandom().nextInt(max - min + 1) + min;
+    }
+
+    //双重校验锁获取一个Random单例
+    public static ThreadLocalRandom getRandom()
+    {
+        return ThreadLocalRandom.current();
     }
 }
