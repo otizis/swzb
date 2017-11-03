@@ -68,6 +68,7 @@ function updateRoomBack(msg){
         if(room.status == 'fighting'){
             $("#fighting").show();
             $("#apply").hide();
+            $("#msg").html("");
             $('<hr><p>人员齐备，比赛开始</p>').appendTo("#msg");
         }
     }else{

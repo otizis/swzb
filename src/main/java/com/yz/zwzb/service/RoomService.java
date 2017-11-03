@@ -13,7 +13,7 @@ public class RoomService
 {
     static AtomicLong maxRoomId = new AtomicLong(1);
 
-    static ConcurrentHashMap<Long, Room> rooms = new ConcurrentHashMap();
+    static ConcurrentHashMap<Long, Room> rooms = new ConcurrentHashMap<Long, Room>();
 
     public static Long createRoom()
     {
