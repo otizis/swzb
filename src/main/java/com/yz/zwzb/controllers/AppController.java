@@ -1,9 +1,6 @@
 package com.yz.zwzb.controllers;
 
-import com.yz.zwzb.domain.Match;
-import com.yz.zwzb.domain.Result;
-import com.yz.zwzb.domain.Room;
-import com.yz.zwzb.domain.Step;
+import com.yz.zwzb.domain.*;
 import com.yz.zwzb.domain.enums.RoomStatusEnum;
 import com.yz.zwzb.domain.response.Resp;
 import com.yz.zwzb.service.MatchService;
@@ -60,25 +57,31 @@ public class AppController
 
         Match match = MatchService.getMatch(matchIdLong);
         List<Step> steps = match.getSteps();
-        Step step = steps.get(match.getCurrStep());
-        if(step != null){
+        int currStep = match.getCurrStep();
+        if (currStep < steps.size())
+        {
+            Step step = steps.get(currStep);
             HashMap<String, Result> playerAnswer = step.getPlayerAnswer();
             playerAnswer.put(principal.getName(), new Result(answer).judg(step.getAnswer()));
             int size = playerAnswer.size();
             if(size == match.getPlayerAccounts().size()){
                 // 环节结束，通知这道题目的所有人答题结果，并下发下一道题目，直到环节结束
                 sendStep2end(match);
-                if(match.getCurrStep() >= match.getSteps().size()){
+                currStep = match.getCurrStep();
+                if (currStep >= match.getSteps().size())
+                {
                     // 比赛结束，发送比赛结果
                     MatchService.countResult(match);
                     Room room = RoomService.getRoom(roomIdLong);
                     room.setStatus(RoomStatusEnum.finished);
                     List<String> players = match.getPlayerAccounts();
+                    HashMap<String, PlayerResultOneMatch> matchResult = match.getMatchResult();
                     for (String player : players)
                     {
                         template.convertAndSendToUser(player, "/queue/reply",//
-                                new Resp("matchEnd").fill("matchResult", match.getMatchResult()));
+                                new Resp("matchEnd").fill("matchResult", matchResult));
                     }
+                    template.convertAndSend("/topic", new Resp("msg").fill("text", match.getResult()));
                 }
             }
         }
@@ -109,6 +112,10 @@ public class AppController
 
     private void updateRoomPlayerList(Room room)
     {
+        if (room == null)
+        {
+            return;
+        }
         // 通知房间的其他人，有新的用户状态
         HashSet<String> playerIds = room.getPlayerAccounts();
         Iterator<String> iterator = playerIds.iterator();

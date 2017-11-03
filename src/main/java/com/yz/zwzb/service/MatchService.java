@@ -5,13 +5,19 @@ import com.yz.zwzb.domain.PlayerResultOneMatch;
 import com.yz.zwzb.domain.Result;
 import com.yz.zwzb.domain.Step;
 import org.springframework.beans.BeanUtils;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Service
 public class MatchService
 {
+    @Resource
+    private SimpMessagingTemplate template;
 
     static AtomicLong maxRoomId = new AtomicLong(0);
 
@@ -27,6 +33,7 @@ public class MatchService
         stepLib.add(newStep3());
         stepLib.add(newStep4());
     }
+
     public static Match getMatch(Long matchId)
     {
         return data.get(matchId);
@@ -133,6 +140,7 @@ public class MatchService
                 if (playerResultOneMatch == null)
                 {
                     playerResultOneMatch = new PlayerResultOneMatch();
+                    playerResultOneMatch.setAccount(account);
                     matchResult.put(account, playerResultOneMatch);
                 }
                 int score = playerResultOneMatch.getScore();
@@ -145,6 +153,7 @@ public class MatchService
         }
         win.setWin(true);
         match.setMatchResult(matchResult);
+        match.setResult(win.getAccount() + "刚刚获得的胜利");
     }
 
     public static List<Step> get5Step()

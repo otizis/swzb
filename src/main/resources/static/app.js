@@ -39,6 +39,9 @@ function connect() {
                 case 'apply':
                     applyBack(resp.msg);
                     break;
+                case 'msg':
+                    topicMsg(resp.msg);
+                    break;
                 default:
                     console.error("不能处理的全局消息~");
             }
@@ -86,14 +89,16 @@ function setConnected(b){
     $("#status").text(b ? "在线" : "离线");
     $("#createRoom").show();
 }
+
 function applyBack(msg) {
     if(roomId){
         return ;
     }
-    if (confirm("是否接受"+msg.playerId+"的邀请？"))
-    {
-        stompClient.send("/app/joinRoom/"+msg.roomId);
-    }
+    $("<p><a class='apply-link' data-roomid='" + msg.roomId + "'> 是否接受" + msg.playerId + "的邀请？</a></p>").appendTo("#topic");
+}
+
+function topicMsg(msg) {
+    $("<p>" + msg.text + "</p>").appendTo("#topic");
 }
 
 
@@ -166,5 +171,9 @@ $(function () {
         clearInterval(countDownTimeOut);
         stompClient.send("/app/answer",{},JSON.stringify({roomId:roomId,matchId:matchId,answer:v}));
         $("#msg input").hide();
+    });
+    $("#topic").on("click", '.apply-link', function () {
+        stompClient.send("/app/joinRoom/" + $(this).data('roomid'));
+        $("#topic").html("");
     })
 });

@@ -12,6 +12,17 @@ public class Match
     List<Step> steps;
     int currStep;
     HashMap<String,PlayerResultOneMatch> matchResult;
+    String result;
+
+    public String getResult()
+    {
+        return result;
+    }
+
+    public void setResult(String result)
+    {
+        this.result = result;
+    }
 
     public int getCurrStep()
     {

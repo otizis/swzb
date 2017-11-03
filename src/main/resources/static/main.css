@@ -14,3 +14,14 @@ input + input {
 body {
     font-size: 16px;
 }
+
+.topic, .main {
+    display: inline-block;
+    width: 45%;
+    vertical-align: top;
+    max-height: 700px;
+}
+
+.apply-link {
+    cursor: pointer;
+}

@@ -36,6 +36,7 @@ public class RoomService
         if (!playerAccounts.contains(playerAccount))
         {
             playerAccounts.add(playerAccount);
+            PlayerService.updatePlayerRoomId(playerAccount, roomId);
             if(playerAccounts.size()>=room.getMaxPlayerNum()){
                 room.setStatus(RoomStatusEnum.fighting);
                 Match match = MatchService.newMatch();
@@ -63,6 +64,7 @@ public class RoomService
         if (playerAccounts.isEmpty())
         {
             rooms.remove(roomId);
+            PlayerService.updatePlayerRoomId(playerAccount, null);
         }
         return null;
     }
