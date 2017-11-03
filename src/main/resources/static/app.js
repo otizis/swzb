@@ -105,7 +105,7 @@ function stepBegin(step){
         optionHtml+= ('<input type="button" data-v="'+obj+'" value="'+a+'">')
     }
     addTOMsg('<p>'+step.question+'['+step.score+'分]<br>'+optionHtml+'</p>');
-    count = 15;
+    count = 10;
     countDownTimeOut = setInterval(function () {
         count--;
         $("#countDown").text(count);
@@ -120,7 +120,7 @@ function stepEnd(step,nextStep){
     var playerAnswer = step.playerAnswer;
     for(var playerId in playerAnswer){
         var result = playerAnswer[playerId];
-        var answer = step.options[result.answer] || '跳过';
+        var answer = step.options[result.answer] || '未作答';
         resultHtml +=('<p>用户'+playerId+'的回答:'+answer+'['+(result.right?'对':'错')+']</p>');
     }
     addTOMsg(resultHtml+'<hr>');
