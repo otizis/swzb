@@ -9,7 +9,7 @@ function connect() {
         console.log('Connected: ' + frame);
         stompClient.subscribe('/user/queue/reply',function(result){
             // 单人通知
-            var resp = JSON.parse(result.body)
+            var resp = JSON.parse(result.body);
             switch(resp.type){
                 case 'createRoom':
                     createRoomBack(resp.msg);
@@ -29,11 +29,11 @@ function connect() {
                 default:
                     console.error("不能处理的消息~");
             }
-        })
+        });
         stompClient.subscribe('/topic', function (greeting) {
             // 全局通知
             console.log(greeting);
-            var resp = JSON.parse(greeting.body)
+            var resp = JSON.parse(greeting.body);
             switch(resp.type){
                 case 'apply':
                     applyBack(resp.msg);
@@ -83,7 +83,7 @@ function updateRoomBack(msg){
 }
 
 function setConnected(b){
-    $("#status").text(b?"在线":"离线")
+    $("#status").text(b ? "在线" : "离线");
     $("#createRoom").show();
 }
 function applyBack(msg) {
@@ -101,7 +101,7 @@ function stepBegin(step){
     $("#exitRoom").hide();
     var optionHtml = "";
     for (var obj in step.options) {
-        var a = step.options[obj]
+        var a = step.options[obj];
         optionHtml+= ('<input type="button" data-v="'+obj+'" value="'+a+'">')
     }
     addTOMsg('<p>'+step.question+'['+step.score+'分]<br>'+optionHtml+'</p>');
@@ -111,7 +111,7 @@ function stepEnd(step,nextStep){
     var playerAnswer = step.playerAnswer;
     for(var playerId in playerAnswer){
         var result = playerAnswer[playerId];
-        var answer = step.options[result.answer]
+        var answer = step.options[result.answer];
         resultHtml +=('<p>用户'+playerId+'的回答:'+answer+'['+(result.right?'对':'错')+']</p>');
     }
     addTOMsg(resultHtml+'<hr>');
@@ -122,7 +122,6 @@ function stepEnd(step,nextStep){
     }
 }
 function matchEnd(matchResult){
-    $("#msg").html("");
     var resultHtml = "";
     var winPlayer = "";
     for(var playerId in matchResult){

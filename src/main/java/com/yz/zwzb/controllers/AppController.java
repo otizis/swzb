@@ -12,7 +12,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.thymeleaf.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.security.Principal;
@@ -54,8 +53,10 @@ public class AppController
     public void answer(Principal principal, HashMap<String, Object> req)
     {
         String matchId = req.get("matchId").toString();
+        String roomId = req.get("roomId").toString();
         Integer answer = (Integer)req.get("answer");
         Long matchIdLong = Long.parseLong(matchId);
+        Long roomIdLong = Long.parseLong(roomId);
 
         Match match = MatchService.getMatch(matchIdLong);
         List<Step> steps = match.getSteps();
@@ -70,6 +71,8 @@ public class AppController
                 if(match.getCurrStep() >= match.getSteps().size()){
                     // 比赛结束，发送比赛结果
                     MatchService.countResult(match);
+                    Room room = RoomService.getRoom(roomIdLong);
+                    room.setStatus(RoomStatusEnum.finished);
                     List<String> players = match.getPlayerAccounts();
                     for (String player : players)
                     {
