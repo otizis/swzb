@@ -1,5 +1,5 @@
 var stompClient = null;
-var playerId,roomId ,matchId;
+var roomId ,matchId;
 
 function connect() {
     var socket = new SockJS('/socket');
@@ -14,9 +14,6 @@ function connect() {
                 case 'createRoom':
                     createRoomBack(resp.msg);
                     break;
-                case 'joinRoom':
-                    updateRoomBack(resp.msg);
-                    break;
                 case 'updateRoom':
                     updateRoomBack(resp.msg);
                     break;
@@ -25,6 +22,9 @@ function connect() {
                     break;
                 case 'stepEnd':
                     stepEnd(resp.msg.step,resp.msg.nextStep);
+                    break;
+                case 'matchEnd':
+                    matchEnd(resp.msg.matchResult);
                     break;
                 default:
                     console.error("不能处理的消息~");
@@ -43,7 +43,10 @@ function connect() {
             }
         });
 
-    });
+    },
+        function (error) {
+            alert(error);
+        });
 }
 
 function createRoomBack(msg){
@@ -54,16 +57,28 @@ function updateRoomBack(msg){
     if(msg.room){
         var room = msg.room;
         $("#roomId").text(room.id);
-        roomId = $("#roomId").text();
+        roomId = room.id;
         matchId = room.matchId;
-        $("#roomPlayers").text(JSON.stringify(room.playerIds));
-        $("#apply").show();
+        $("#roomPlayers").text(JSON.stringify(room.playerAccounts));
+        if(room.playerAccounts.length < room.maxPlayerNum){
+            $("#apply").show();
+            $("#exitRoom").show();
+        }
         $("#createRoom").hide();
         if(room.status == 'fighting'){
             $("#fighting").show();
             $("#apply").hide();
             $('<hr><p>人员齐备，比赛开始</p>').appendTo("#msg");
         }
+    }else{
+        $("#roomId").text("未进入房间");
+        $("#roomPlayers").text("未进入房间");
+        roomId = null;
+        matchId = null;
+        $("#createRoom").show();
+        $("#exitRoom").hide();
+        $("#apply").hide();
+        $("#msg").html("");
     }
 }
 
@@ -83,12 +98,13 @@ function applyBack(msg) {
 
 
 function stepBegin(step){
+    $("#exitRoom").hide();
     var optionHtml = "";
     for (var obj in step.options) {
         var a = step.options[obj]
         optionHtml+= ('<input type="button" data-v="'+obj+'" value="'+a+'">')
     }
-    addTOMsg('<p>'+step.question+'<br>'+optionHtml+'</p>');
+    addTOMsg('<p>'+step.question+'['+step.score+'分]<br>'+optionHtml+'</p>');
 }
 function stepEnd(step,nextStep){
     var resultHtml = "";
@@ -102,8 +118,22 @@ function stepEnd(step,nextStep){
     if(nextStep){
         stepBegin(nextStep);
     }else{
-        addTOMsg('<hr><p>比赛结束</p>');
+        addTOMsg('<p>比赛结束,正在统计总得分。。</p>');
     }
+}
+function matchEnd(matchResult){
+    $("#msg").html("");
+    var resultHtml = "";
+    var winPlayer = "";
+    for(var playerId in matchResult){
+        var result = matchResult[playerId];
+        resultHtml +=('<p>用户'+playerId+'的总得分:'+result.score+'</p>');
+        if(result.win){
+            winPlayer = playerId;
+        }
+    }
+    addTOMsg(resultHtml+'<p>获胜的是：'+winPlayer+'</p>');
+    $("#exitRoom").show();
 }
 
 function addTOMsg(html){
@@ -112,10 +142,12 @@ function addTOMsg(html){
 }
 
 $(function () {
-    playerId = $("#playerId").text();
     connect();
     $( "#createRoom" ).click(function() {
-        stompClient.send("/app/createRoom",{},JSON.stringify({playerId:playerId}));
+        stompClient.send("/app/createRoom",{});
+    });
+    $( "#exitRoom" ).click(function() {
+        stompClient.send("/app/exitRoom/"+roomId,{});
     });
     $( "#apply" ).click(function() {
         stompClient.send("/app/apply",{},JSON.stringify({roomId:roomId}));

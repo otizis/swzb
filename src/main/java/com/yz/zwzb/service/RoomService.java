@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Service
+public class RoomService
 {
     static AtomicLong maxRoomId = new AtomicLong(1);
 
@@ -22,24 +22,24 @@ public class Service
         return l;
     }
 
-    public static Room joinRoom(Long roomId, Long playerId)
+    public static Room joinRoom(Long roomId, String playerAccount)
     {
         Room room = rooms.get(roomId);
         if(room == null){
             return  null;
         }
-        HashSet<Long> playerIds = room.getPlayerIds();
-        if (playerIds.size() >= room.getMaxPlayerNum())
+        HashSet<String> playerAccounts = room.getPlayerAccounts();
+        if (playerAccounts.size() >= room.getMaxPlayerNum())
         {
             return null;
         }
-        if (!playerIds.contains(playerId))
+        if (!playerAccounts.contains(playerAccount))
         {
-            playerIds.add(playerId);
-            if(playerIds.size()>=room.getMaxPlayerNum()){
+            playerAccounts.add(playerAccount);
+            if(playerAccounts.size()>=room.getMaxPlayerNum()){
                 room.setStatus(RoomStatusEnum.fighting);
                 Match match = MatchService.newMatch();
-                match.setPlayers(new ArrayList(room.getPlayerIds()));
+                match.setPlayerAccounts(new ArrayList(room.getPlayerAccounts()));
                 room.setMatchId(match.getId());
             }
         }
@@ -48,5 +48,23 @@ public class Service
             return null;
         }
         return room;
+    }
+    public static Room exitRoom(Long roomId, String playerAccount)
+    {
+        Room room = rooms.get(roomId);
+        if(room == null){
+            return  null;
+        }
+        if(RoomStatusEnum.fighting.equals(room.getStatus())){
+            return room;
+        }
+        HashSet<String> playerAccounts = room.getPlayerAccounts();
+        playerAccounts.remove(playerAccount);
+        return null;
+    }
+
+    public static Room getRoom(Long roomId)
+    {
+        return rooms.get(roomId);
     }
 }

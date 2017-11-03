@@ -5,14 +5,14 @@ import com.yz.zwzb.domain.Result;
 import com.yz.zwzb.domain.Room;
 import com.yz.zwzb.domain.Step;
 import com.yz.zwzb.domain.enums.RoomStatusEnum;
-import com.yz.zwzb.domain.request.CreateRoomReq;
 import com.yz.zwzb.domain.response.Resp;
 import com.yz.zwzb.service.MatchService;
-import com.yz.zwzb.service.Service;
+import com.yz.zwzb.service.RoomService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.thymeleaf.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.security.Principal;
@@ -29,11 +29,10 @@ public class AppController
 
     // 用户创建房间
     @MessageMapping("/createRoom")
-    public void createRoom(Principal principal, CreateRoomReq req)
+    public void createRoom(Principal principal)
     {
         String name = principal.getName();
-        System.out.println("name :" + name);
-        Long roomId = Service.createRoom();
+        Long roomId = RoomService.createRoom();
         Resp resp = new Resp("createRoom");
         resp.fill("roomId", roomId);
         template.convertAndSendToUser(name, "/queue/reply", resp);
@@ -54,22 +53,30 @@ public class AppController
     @MessageMapping("/answer")
     public void answer(Principal principal, HashMap<String, Object> req)
     {
-        Resp message = new Resp("answer");
         String matchId = req.get("matchId").toString();
         Integer answer = (Integer)req.get("answer");
         Long matchIdLong = Long.parseLong(matchId);
+
         Match match = MatchService.getMatch(matchIdLong);
         List<Step> steps = match.getSteps();
         Step step = steps.get(match.getCurrStep());
-        if(step!=null){
-            HashMap<Long, Result> playerAnswer = step.getPlayerAnswer();
-
-            playerAnswer.put(Long.parseLong(principal.getName()), new Result(answer).judg(step.getAnswer()));
-
+        if(step != null){
+            HashMap<String, Result> playerAnswer = step.getPlayerAnswer();
+            playerAnswer.put(principal.getName(), new Result(answer).judg(step.getAnswer()));
             int size = playerAnswer.size();
-            if(size == match.getPlayers().size()){
-                // 环节结束，通知这道题目的所有人答题结果，下发下一道题目
-                sendStepEnd(matchIdLong);
+            if(size == match.getPlayerAccounts().size()){
+                // 环节结束，通知这道题目的所有人答题结果，并下发下一道题目，直到环节结束
+                sendStep2end(match);
+                if(match.getCurrStep() >= match.getSteps().size()){
+                    // 比赛结束，发送比赛结果
+                    MatchService.countResult(match);
+                    List<String> players = match.getPlayerAccounts();
+                    for (String player : players)
+                    {
+                        template.convertAndSendToUser(player, "/queue/reply",//
+                                new Resp("matchEnd").fill("matchResult", match.getMatchResult()));
+                    }
+                }
             }
         }
     }
@@ -78,24 +85,35 @@ public class AppController
     @MessageMapping("/joinRoom/{roomId}")
     public void joinRoom(Principal principal, @DestinationVariable Long roomId)
     {
-        Long playerId = Long.parseLong(principal.getName());
-        Room room = Service.joinRoom(roomId, playerId);
-
-        template.convertAndSendToUser(principal.getName(), "/queue/reply", new Resp("joinRoom").fill("room", room));
-        HashSet<Long> playerIds = room.getPlayerIds();
-        Iterator<Long> iterator = playerIds.iterator();
-        while (iterator.hasNext())
-        {
-            Long next = iterator.next();
-            if (next != null && next.compareTo(playerId) != 0)
-            {
-                template.convertAndSendToUser(String.valueOf(next), "/queue/reply",//
-                        new Resp("updateRoom").fill("room", room));
-            }
-        }
+        String playerAccount = principal.getName();
+        Room room = RoomService.joinRoom(roomId, playerAccount);
+        updateRoomPlayerList(room);
         if (RoomStatusEnum.fighting.equals(room.getStatus()))
         {
             sendStepBegin(room.getMatchId());
+        }
+    }
+
+    // 用户退出房间
+    @MessageMapping("/exitRoom/{roomId}")
+    public void exitRoom(Principal principal, @DestinationVariable Long roomId)
+    {
+        String playerAccount = principal.getName();
+        Room room = RoomService.exitRoom(roomId, playerAccount);
+        template.convertAndSendToUser(principal.getName(), "/queue/reply", new Resp("updateRoom").fill("room", room));
+        updateRoomPlayerList(RoomService.getRoom(roomId));
+    }
+
+    private void updateRoomPlayerList(Room room)
+    {
+        // 通知房间的其他人，有新的用户状态
+        HashSet<String> playerIds = room.getPlayerAccounts();
+        Iterator<String> iterator = playerIds.iterator();
+        while (iterator.hasNext())
+        {
+            String next = iterator.next();
+            template.convertAndSendToUser(next, "/queue/reply",//
+                    new Resp("updateRoom").fill("room", room));
         }
     }
 
@@ -104,36 +122,41 @@ public class AppController
         Match match = MatchService.getMatch(matchId);
         if (match != null)
         {
-            List<Long> players = match.getPlayers();
+            List<String> players = match.getPlayerAccounts();
             List<Step> steps = match.getSteps();
             int currStep = match.getCurrStep();
             Step step = steps.get(currStep);
-            for (Long player : players)
+            for (String player : players)
             {
-                template.convertAndSendToUser(String.valueOf(player), "/queue/reply",//
+                template.convertAndSendToUser(player, "/queue/reply",//
                         new Resp("stepBegin").fill("step", step));
             }
         }
     }
-    private void sendStepEnd(Long matchId)
+    private void sendStep2end(Match match)
     {
-        Match match = MatchService.getMatch(matchId);
         if (match != null)
         {
             List<Step> steps = match.getSteps();
             int currStep = match.getCurrStep();
             Step step = steps.get(currStep);
+
+            int nextStepIndex = currStep + 1;
+            int maxStepIndex = steps.size() - 1;
             Step nextStep = null;
-            if(currStep < steps.size()-1){
-                nextStep = steps.get(currStep+1);
-            }
-            List<Long> players = match.getPlayers();
-            for (Long player : players)
+            if(nextStepIndex <= maxStepIndex)
             {
-                template.convertAndSendToUser(String.valueOf(player), "/queue/reply",//
+                nextStep = steps.get(nextStepIndex);
+            }
+
+            match.setCurrStep(nextStepIndex);
+
+            List<String> players = match.getPlayerAccounts();
+            for (String player : players)
+            {
+                template.convertAndSendToUser(player, "/queue/reply",//
                         new Resp("stepEnd").fill("step", step).fill("nextStep", nextStep));
             }
-            match.setCurrStep(currStep + 1);
         }
     }
 }

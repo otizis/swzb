@@ -29,14 +29,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
-                .withUser("1").password("111111").roles("USER")
+                .withUser("test1").password("111111").roles("USER")
                 .and()
-                .withUser("2").password("111111").roles("USER")
+                .withUser("test2").password("111111").roles("USER")
                 .and()
-                .withUser("3").password("111111").roles("USER")
+                .withUser("test3").password("111111").roles("USER")
                 .and()
-                .withUser("4").password("111111").roles("USER")
+                .withUser("test4").password("111111").roles("USER")
                 .and()
-                .withUser("user").password("password").roles("USER");
+                .withUser("test5").password("111111").roles("USER");
     }
 }

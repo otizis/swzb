@@ -1,8 +1,5 @@
 package com.yz.zwzb.domain;
 
-import org.thymeleaf.util.NumberUtils;
-import org.thymeleaf.util.StringUtils;
-
 import java.util.Date;
 
 public class Result

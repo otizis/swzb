@@ -10,7 +10,18 @@ public class Step
     String question;
     List<String> options;
     int answer;
-    HashMap<Long,Result> playerAnswer = new HashMap<>();
+    int score = 5;
+    HashMap<String,Result> playerAnswer = new HashMap<>();
+
+    public int getScore()
+    {
+        return score;
+    }
+
+    public void setScore(int score)
+    {
+        this.score = score;
+    }
 
     public Date getTime()
     {
@@ -52,12 +63,12 @@ public class Step
         this.answer = answer;
     }
 
-    public HashMap<Long, Result> getPlayerAnswer()
+    public HashMap<String, Result> getPlayerAnswer()
     {
         return playerAnswer;
     }
 
-    public void setPlayerAnswer(HashMap<Long, Result> playerAnswer)
+    public void setPlayerAnswer(HashMap<String, Result> playerAnswer)
     {
         this.playerAnswer = playerAnswer;
     }

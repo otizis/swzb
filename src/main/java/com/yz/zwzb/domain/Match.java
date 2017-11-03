@@ -1,15 +1,17 @@
 package com.yz.zwzb.domain;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class Match
 {
     Long id;
     Date startTime;
-    List<Long> players;
+    List<String> playerAccounts;
     List<Step> steps;
     int currStep;
+    HashMap<String,PlayerResultOneMatch> matchResult;
 
     public int getCurrStep()
     {
@@ -41,14 +43,14 @@ public class Match
         this.startTime = startTime;
     }
 
-    public List<Long> getPlayers()
+    public List<String> getPlayerAccounts()
     {
-        return players;
+        return playerAccounts;
     }
 
-    public void setPlayers(List<Long> players)
+    public void setPlayerAccounts(List<String> playerAccounts)
     {
-        this.players = players;
+        this.playerAccounts = playerAccounts;
     }
 
     public List<Step> getSteps()
@@ -59,5 +61,15 @@ public class Match
     public void setSteps(List<Step> steps)
     {
         this.steps = steps;
+    }
+
+    public HashMap<String, PlayerResultOneMatch> getMatchResult()
+    {
+        return matchResult;
+    }
+
+    public void setMatchResult(HashMap<String, PlayerResultOneMatch> matchResult)
+    {
+        this.matchResult = matchResult;
     }
 }

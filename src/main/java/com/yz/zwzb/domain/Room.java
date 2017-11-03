@@ -19,7 +19,7 @@ public class Room
     Long id;
     RoomStatusEnum status;
     Long matchId;
-    HashSet<Long> playerIds = new HashSet<>();
+    HashSet<String> playerAccounts = new HashSet<>();
     int maxPlayerNum = 2;
 
     public int getMaxPlayerNum()
@@ -32,14 +32,14 @@ public class Room
         this.maxPlayerNum = maxPlayerNum;
     }
 
-    public HashSet<Long> getPlayerIds()
+    public HashSet<String> getPlayerAccounts()
     {
-        return playerIds;
+        return playerAccounts;
     }
 
-    public void setPlayerIds(HashSet<Long> playerIds)
+    public void setPlayerAccounts(HashSet<String> playerAccounts)
     {
-        this.playerIds = playerIds;
+        this.playerAccounts = playerAccounts;
     }
 
     public Long getId()
